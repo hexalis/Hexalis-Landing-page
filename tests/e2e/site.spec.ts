@@ -1,13 +1,17 @@
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
-// color-contrast is excluded until the known light-theme findings in docs/validation.md are fixed; every other A/AA rule stays strict.
-const axe = (page: import('@playwright/test').Page) => new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa']).disableRules(['color-contrast']).analyze();
+const axe = (page: import('@playwright/test').Page) => new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa']).analyze();
 
 for (const path of ['/', '/en/', '/404/']) test(`${path} has metadata, no overflow and no automated WCAG A/AA violations`, async ({ page }) => {
   await page.goto(path); await expect(page.locator('h1')).toHaveCount(1);
   await expect(page.locator('link[rel=canonical]')).toHaveCount(path === '/404/' ? 0 : 1);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   expect((await axe(page)).violations).toEqual([]);
+});
+
+test('dark theme has no automated WCAG A/AA violations', async ({ page }) => {
+  await page.emulateMedia({ colorScheme: 'dark' });
+  for (const path of ['/', '/en/']) { await page.goto(path); expect((await axe(page)).violations).toEqual([]); }
 });
 
 test('both locales boot the page script and the animated journey without errors', async ({ page }) => {
