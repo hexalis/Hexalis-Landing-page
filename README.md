@@ -1,6 +1,8 @@
-# ABC Astro
+# Hexalis · Landing page
 
-A static-first starter for landing pages and small browser tools. Three example compositions (SaaS, studio, event), Spanish/English routes and a working estimator share one foundation. All business names and claims in the demos are fictional.
+The public site of Hexalis, a non-profit that designs and builds open source projects: Hexalis Design System, Hexalis Design Ops Toolkit and community projects. Spanish lives at `/`, English at `/en/`.
+
+Built with Astro on top of the [abc-astro](https://github.com/RogerG03/abc-astro) starter: static output, no client framework, typed bilingual copy and automated quality gates.
 
 ## Start
 
@@ -11,18 +13,32 @@ npm ci
 npm run dev
 ```
 
-Open `http://127.0.0.1:4321`. Try `/`, `/en/`, `/landing/saas/`, `/landing/studio/`, `/landing/event/`, `/app/` and their `/en/` equivalents. `npm run preview` serves a completed build.
+Open `http://127.0.0.1:4321` (Spanish) or `/en/` (English). `npm run preview` serves a completed build. The 3D journey and the security policy only behave exactly as in production in a build (`npm run build && npm run preview`).
 
-## Adapt
+## Where things live
 
-1. Choose a composition in `src/content/landings/`. Edit both locale JSON files; their schema validates at build time.
-2. Change the order of `sections` or compose Astro sections directly in a view. Add a section in the schema and the view together. Do not build an arbitrary JSON page renderer.
-3. Set brand tokens in `src/styles/tokens.css`, then adjust the composition in `src/styles/global.css`. Demo variants intentionally have different hero treatments.
-4. Replace fictional content and CTA destinations. Add real local images under `src/assets/` and use `ResponsiveImage` in the hero's `media` slot; set `priority` only for the LCP image. No stock photography or customer claims are bundled.
-5. Set **SITE_URL** to the real origin through the build environment before publishing. The default `https://example.com` intentionally emits `noindex` and disallows crawling. A preview built with a real domain needs host-level access protection or a separate preview origin/indexing policy.
-6. Run the checks below and deploy **dist/** to a static host. Configure the host to serve `404.html` with HTTP 404; disable SPA fallback. Root deployment is supported; subpath deployment needs base-aware links and an explicit audit.
+| Path | What it holds |
+| --- | --- |
+| `src/pages/` | Routes: `/`, `/en/`, `404`, `robots.txt` |
+| `src/views/HomeView.astro` | Composes the landing from its sections |
+| `src/layouts/SiteLayout.astro` | Document shell, SEO, navigation, footer, command palette |
+| `src/components/sections/` | Journey (3D story), Works, Playground, Projects, Log, Team, Join, Faq, Finale |
+| `src/components/layout/`, `ui/`, `seo/` | Navigation and drawer, footer, command palette, metadata |
+| `src/scripts/app.js` | Page behaviour: theme, menu, playground, team hive, timeline, command palette, presence |
+| `src/scripts/scene.js` | The 3D journey (three.js). Loaded lazily as its own chunk |
+| `src/styles/tokens.css` | Fonts and Hexalis Design System variables (palettes, themes) |
+| `src/styles/global.css` | Layout and components |
+| `src/i18n/ui.ts` | Typed page-level copy (title, description, 404) |
+| `public/assets/` | Covers and the social image |
+| `docs/design/` | Design history in Spanish: audit, voice and tone, 3D refinement |
 
-`SITE_URL` is read by `astro.config.ts` from the process environment. Export it in your shell/hosting settings; copying `.env.example` alone does not set this configuration value.
+Every section takes a `locale` prop. Copy is written next to its markup as `tr('español', 'english')`, so a section cannot ship one language without the other. Team members, their links (`TEAM[].links`) and the timeline data live in `src/scripts/app.js` and the Log section.
+
+## Before publishing
+
+- Set **SITE_URL** to the real origin in the build environment. With the default `https://example.com` every page is `noindex` and robots disallows crawling; canonical, hreflang, `og:url` and `og:image` all derive from it.
+- Fill `TEAM[].links` (GitHub user, LinkedIn and portfolio URLs) and the `LINKS` block in `src/scripts/app.js`. Empty links are hidden.
+- Deploy `dist/` to a static host; serve `404.html` with HTTP 404 and disable SPA fallback.
 
 ```powershell
 $env:SITE_URL = 'https://your-domain.com'
@@ -37,15 +53,12 @@ npx playwright install chromium
 npm run test:e2e
 ```
 
-`verify` runs Astro/TypeScript checks, unit tests, production build and gzip budgets. Browser tests cover the generated routes at desktop/mobile sizes, automated WCAG A/AA checks, calculator validation, theme persistence and no-script content. Automated checks do not certify WCAG conformance. Review keyboard navigation, screen-reader announcements, zoom, contrast and real phones for each project.
+`verify` runs Astro/TypeScript checks, unit tests, the production build, link/locale checks and gzip budgets (the lazy 3D chunk has its own budget). Browser tests run with reduced motion except one that boots the animated journey; they cover metadata, overflow, automated WCAG A/AA checks, theme persistence, blocked storage and no-script content.
 
-## Learn and extend
+## Security
 
-- [Architecture and ownership](docs/architecture.md)
-- [Recipes and extension boundaries](docs/recipes.md)
-- [Research synthesis and source decisions](docs/research.md)
-- [Quality, deployment and limits](docs/quality.md)
-- [Observed validation results](docs/validation.md)
-- [Reusable skills](https://github.com/RogerG03/my-personals-skills): `astro-composable-starter` and `astro-release-quality`.
+Astro emits a Content Security Policy per page (`security.csp` in `astro.config.ts`) with hashes for its scripts and styles. Allowed connections: `api.github.com` (contributors) and `avatars.githubusercontent.com` (photos). Inline `style` attributes are allowed because sections set per-element custom properties. If presence over WebSocket is enabled (`LIVE.presenceUrl`), add its origin to `connect-src`.
 
-No client framework, CMS, backend, tracker or authentication service is installed. The calculator processes values in memory; only the theme preference is stored locally. Add a server adapter and boundary validation when the product actually requires persistent or private data.
+## Learn more
+
+- [Architecture](docs/architecture.md) · [Quality and release](docs/quality.md) · [Validation record](docs/validation.md)

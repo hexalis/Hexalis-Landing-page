@@ -1,30 +1,30 @@
 # Validation record
 
-Checked on 2026-10-25 (America/Managua), Windows, Node 24.20.0, Astro 7.4.2.
+Checked on 2026-10-26 (America/Managua), Windows, Node 24.22.1, Astro 7.4.2, three.js 0.160.0.
 
 | Check | Observed result |
 | --- | --- |
-| `npm run check` | 0 errors, 0 warnings, 0 hints |
-| `npm test` | 3 tests passed: arithmetic bounds, invalid numbers, localized paths |
-| `npm run build` | 11 pages, including both languages and 404 |
+| `npm run check` | 0 errors |
+| `npm test` | Localized paths |
+| `npm run build` | 3 pages: `/`, `/en/`, `404` |
 | `npm run test:build` | Generated links and language alternatives resolve |
-| `npm run budget` | 760 gzip bytes JS including the largest page's inline scripts; 1,899 gzip bytes CSS |
-| `npm run test:e2e` | 30 passed: Chromium desktop/mobile, route metadata, overflow, axe, calculation, themes, blocked storage, no-script content |
-| `npm install` audit | 0 reported vulnerabilities in the resolved dependency tree |
-| Alternate production origin | Build with `SITE_URL=https://abc.example` emitted that origin, indexable metadata and allowing robots; default build restored afterwards |
-| Design source lint | 0 failures, 0 warnings |
-| Visual review | Catalogue at 1440/768/390px; light calculator/studio and mobile event inspected |
+| `npm run budget` | 3D chunk 143,059 gzip bytes / 160 KiB; other JS 17,007 / 80 KiB; CSS 13,167 / 60 KiB |
+| `npm run test:e2e` | 16 passed (Chromium desktop and mobile): metadata, overflow, axe A/AA (except color-contrast, below), script boot with the animated journey in both locales, theme persistence, menu scrolling, blocked storage, no-script content |
+| `npm audit --omit=dev` | 0 reported vulnerabilities |
+| CSP | No violations in captures of both locales at 1440 and 375 px |
+| Visual review | Both locales captured section by section at 1440 and 375 px, dark and light, and compared with the previous static page: no visible differences |
 
-The design inspector's unmodified gallery rubric reports `few-pictures` and `still-page` failures, plus no-video and cream-text warnings. Those are explicit limits of this typography-led starter, not passing checks. No unrelated imagery or entrance choreography was added to satisfy a gallery quota. The implementation has no fetched media or font credits to supply.
+## Known accessibility findings (color contrast, light theme)
 
-ROUND 1
+axe reports these against WCAG AA 4.5:1. They predate the migration and need a design decision before changing colours:
 
-Seen in one second: the large Spanish composition headline.
-Idea: ABC's selectable landing compositions become the catalogue's coloured working material.
-Live thing: follow a recipe or calculate hours times rate.
-Layout words: hero=statement / catalogue=three choices / approach=split / FAQ=disclosure.
-Scores: design 6.5 · usability 8 · creativity 6 · content 7 → overall 7.0 before the inspector cap; **6.0 with its unresolved failures**.
-Caps applied: missing imagery and entrance motion; this remains a starter rather than a finished branded marketing site.
-Top three limits: no project-specific media, no signature motion, and deliberately sample business content. Their appropriate fix is to supply a real brand brief, assets and claims when deriving a site; adding fictional proof or arbitrary assets here would obscure the starter's purpose.
+| Element | Ratio | Where |
+| --- | --- | --- |
+| `.btn-ops` (dark text on teal) | 2.92:1 | Works, Toolkit action |
+| `.danger` (white on red) | 3.91:1 | Playground, Delete button |
+| `.ok.pill` (green on pale green) | 4.01:1 | Works, status pills |
+| `.pill.ops` (teal on pale teal) | 4.03:1 | Hero card (English) |
+| `.pill.ds` (blue on pale blue) | 4.24–4.36:1 | Hero card, Projects |
+| `#wordmark` | 1.09:1 | Finale decorative wordmark (`aria-hidden`), intentionally faint |
 
-No real-device, screen-reader, deployed-header, Lighthouse or field Web Vitals result is claimed. CI is configured separately; a passing local run is not a remote CI acknowledgment.
+The browser tests disable only the `color-contrast` rule until these are resolved.

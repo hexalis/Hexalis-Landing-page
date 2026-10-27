@@ -1,21 +1,30 @@
 ---
-import { getCollection } from 'astro:content';
 import SiteLayout from '../layouts/SiteLayout.astro';
-import Hero from '../components/sections/Hero.astro';
+import Journey from '../components/sections/Journey.astro';
+import Works from '../components/sections/Works.astro';
+import Playground from '../components/sections/Playground.astro';
+import Projects from '../components/sections/Projects.astro';
+import Log from '../components/sections/Log.astro';
+import Team from '../components/sections/Team.astro';
+import Join from '../components/sections/Join.astro';
 import Faq from '../components/sections/Faq.astro';
-import Action from '../components/ui/Action.astro';
-import { localizedPath, type Locale } from '../lib/routes';
+import Finale from '../components/sections/Finale.astro';
 import { ui } from '../i18n/ui';
+import type { Locale } from '../lib/routes';
 interface Props { locale: Locale }
 const { locale } = Astro.props;
 const t = ui(locale);
-const entries = (await getCollection('landings', ({data}) => data.locale === locale)).sort((a,b) => a.data.slug.localeCompare(b.data.slug));
 ---
-<SiteLayout title={t.title} description={t.intro} locale={locale}>
-  <Hero title={t.title} description={t.intro}><Action slot="actions" href="#templates">{t.explore}</Action></Hero>
-  <section id="templates" class="catalogue wrap"><h2>{t.collection}</h2><div class="recipe-list">
-    {entries.map(({ data }) => <a class:list={['recipe', data.kind]} href={localizedPath(locale, `landing/${data.slug}`)}><span>{data.name}</span><strong>{data.title}</strong><span>{t.open} ↗</span></a>)}
-  </div></section>
-  <section class="statement wrap"><h2>{t.approach}</h2><p>{t.detail}</p><a href={localizedPath(locale, 'app')}>{t.app} →</a></section>
-  <Faq title={t.faq} items={[{question:t.question,answer:t.answer}]} />
+<SiteLayout title={t.title} description={t.description} shareDescription={t.shareDescription} locale={locale}>
+  <main id="contenido">
+    <Journey locale={locale} />
+    <Works locale={locale} />
+    <Playground locale={locale} />
+    <Projects locale={locale} />
+    <Log locale={locale} />
+    <Team locale={locale} />
+    <Join locale={locale} />
+    <Faq locale={locale} />
+    <Finale locale={locale} />
+  </main>
 </SiteLayout>

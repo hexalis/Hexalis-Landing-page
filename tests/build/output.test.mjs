@@ -9,7 +9,7 @@ async function pages(dir) {
 
 test('built pages link to real routes and expose matching locale alternatives', async () => {
   const files = (await pages('dist')).filter(file => file.endsWith('.html'));
-  assert.ok(files.length >= 11, 'Expected both locales, recipes, apps and the error page');
+  assert.ok(files.length >= 3, 'Expected both locales and the error page');
   for (const file of files) {
     const html = await readFile(file, 'utf8');
     assert.equal([...html.matchAll(/<h1(?:\s|>)/g)].length, 1, file);
