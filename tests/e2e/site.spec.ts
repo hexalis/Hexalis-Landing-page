@@ -5,10 +5,18 @@ import AxeBuilder from '@axe-core/playwright';
    and transition (the pulsing rings loop forever and are excluded). */
 const settle = async (page: Page) => {
   await page.evaluate(() => new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => resolve()))));
-  await page.waitForFunction(() => document.getAnimations().every(a => {
-    const timing = a.effect?.getComputedTiming();
-    return timing?.endTime === Infinity || a.playState !== 'running';
-  }), null, { timeout: 5000 }).catch(() => {});
+  await page.waitForFunction(() => {
+    const running = document.getAnimations().some(a => {
+      const timing = a.effect?.getComputedTiming();
+      return timing?.endTime !== Infinity && a.playState === 'running';
+    });
+    // With reduced motion every .rise is marked .in at boot; wait until its opacity
+    // transition has actually reached the final value. The playground guide is
+    // intentionally transparent and is not page content.
+    const fading = [...document.querySelectorAll('.rise.in > *')].some(el =>
+      !el.classList.contains('guide') && getComputedStyle(el).opacity !== '1');
+    return !running && !fading;
+  }, null, { timeout: 5000 }).catch(() => {});
 };
 const axe = async (page: Page) => { await settle(page); return new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa']).analyze(); };
 
