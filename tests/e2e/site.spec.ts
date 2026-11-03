@@ -1,6 +1,16 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
-const axe = (page: import('@playwright/test').Page) => new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa']).analyze();
+/* Axe must run on the final colors: the entrance fades animate opacity, and scanning a
+   frame mid-transition reports false contrast failures. Wait for every finite animation
+   and transition (the pulsing rings loop forever and are excluded). */
+const settle = async (page: Page) => {
+  await page.evaluate(() => new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => resolve()))));
+  await page.waitForFunction(() => document.getAnimations().every(a => {
+    const timing = a.effect?.getComputedTiming();
+    return timing?.endTime === Infinity || a.playState !== 'running';
+  }), null, { timeout: 5000 }).catch(() => {});
+};
+const axe = async (page: Page) => { await settle(page); return new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa']).analyze(); };
 
 for (const path of ['/', '/en/', '/404/']) test(`${path} has metadata, no overflow and no automated WCAG A/AA violations`, async ({ page }) => {
   await page.goto(path); await expect(page.locator('h1')).toHaveCount(1);
