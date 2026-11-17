@@ -1106,12 +1106,17 @@ const loopIO = new IntersectionObserver(es => es.forEach(e => e.target.classList
 window.HX = Object.assign(window.HX || {}, { LANG, tr, TEAM, still, reduceMotion, journey: () => journeyP });
 window.HX_OK = true;
 
-/* El recorrido 3D: en escritorio arranca de inmediato; en pantallas táctiles espera a que el navegador
-   quede libre (máximo 1,5 s) para que los primeros toques no compitan con la compilación de la escena */
+/* El recorrido 3D (~140 KB y la compilación de shaders) espera a que la página termine de cargar y el navegador
+   quede libre, para no competir con el primer pintado: hasta 1,5 s en pantallas táctiles, 500 ms en escritorio.
+   Con ahorro de datos activado no se descarga: se queda el panal de respaldo. */
 {
+  const saveData = (navigator.connection && navigator.connection.saveData) || matchMedia('(prefers-reduced-data: reduce)').matches;
   const loadScene = () => import('./scene.js').catch(() => $('#stage3d').classList.add('no-gl'));
-  if (matchMedia('(pointer: coarse)').matches) addEventListener('load', () => (window.requestIdleCallback || (f => setTimeout(f, 600)))(loadScene, { timeout: 1500 }), { once: true });
-  else loadScene();
+  const timeout = matchMedia('(pointer: coarse)').matches ? 1500 : 500;
+  const whenIdle = () => (window.requestIdleCallback || (f => setTimeout(f, 200)))(loadScene, { timeout });
+  if (saveData) $('#stage3d').classList.add('no-gl');
+  else if (document.readyState === 'complete') whenIdle();
+  else addEventListener('load', whenIdle, { once: true });
 }
 /* si la escena 3D no arranca (sin WebGL o sin red), se muestra el panal de respaldo */
 setTimeout(() => { const st = $('#stage3d'); if (!st.classList.contains('gl-ready')) st.classList.add('no-gl'); }, 6000);

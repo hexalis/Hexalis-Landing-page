@@ -213,6 +213,11 @@ body.in-journey .me { opacity: 0; }
 @media (hover: hover) and (pointer: fine) { .tile.cover:hover img { transform: scale(1.035); } }
 .img-light { display: none !important; }
 :root[data-theme="light"] .img-light { display: block !important; } :root[data-theme="light"] .img-dark { display: none !important; }
+/* sin tema elegido manda el del sistema: en claro, las portadas y su fondo también van en claro */
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) .img-light { display: block !important; } :root:not([data-theme="dark"]) .img-dark { display: none !important; }
+  :root:not([data-theme="dark"]) .b-ds-cover { --cov: #EEF0F8; } :root:not([data-theme="dark"]) .b-ops-cover { --cov: #F5F6FA; }
+}
 .tile.info { padding: clamp(24px, 2.2vw, 36px); display: flex; flex-direction: column; gap: 18px; box-shadow: inset 0 0 0 1px var(--glass-edge); }
 .tile.info .actions { display: flex; flex-wrap: wrap; gap: 8px; padding-top: 4px; }
 .tile.info .actions .btn { min-height: 44px; padding: 0 20px; font-size: .9375rem; }
@@ -742,9 +747,12 @@ button.s-badge:focus-visible { outline: 2px solid var(--s-accent); outline-offse
 .js .sec-head.rise > h2.masked > .mask-in { display: block; transform: translateY(108%); }
 .js .sec-head.rise.in > h2.masked > .mask-in { transform: none; transition: transform 700ms var(--ease-out); }
 /* Portadas que se descubren de abajo hacia arriba */
-.js .tile.cover.rise > * { opacity: 1; transform: scale(1.06); clip-path: inset(100% 0 0 0); }
-.js .tile.cover.rise.in > * { transform: scale(1.001); clip-path: inset(0 0 0 0); transition: clip-path 800ms var(--ease-io), transform 1s var(--ease-out); }
-.js .tile.cover.rise.in.revealed > * { transition: clip-path 800ms var(--ease-io), transform 700ms var(--ease-out); }
+/* cada portada llega envuelta en <picture>: sin caja propia, el recorte y la escala van sobre la imagen
+   (un clip-path sobre el <picture> en línea, de tamaño cero, la ocultaría y frenaría su carga diferida) */
+.tile.cover picture { display: contents; }
+.js .tile.cover.rise img { opacity: 1; transform: scale(1.06); clip-path: inset(100% 0 0 0); }
+.js .tile.cover.rise.in img { transform: scale(1.001); clip-path: inset(0 0 0 0); transition: clip-path 800ms var(--ease-io), transform 1s var(--ease-out); }
+.js .tile.cover.rise.in.revealed img { transition: clip-path 800ms var(--ease-io), transform 700ms var(--ease-out); }
 .no-motion-js .rise > * { opacity: 1 !important; transform: none !important; }
 .js .hero .line, .js .hero-foot, .js .building { animation: heroIn 1s var(--ease-out) both; }
 .js .hero .line:nth-child(2) { animation-delay: 80ms; }

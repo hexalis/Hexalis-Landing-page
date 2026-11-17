@@ -3,6 +3,15 @@ import type { Locale } from '../../lib/routes';
 interface Props { locale: Locale }
 const { locale } = Astro.props;
 const tr = (es: string, en: string) => (locale === 'en' ? en : es);
+import { Picture } from 'astro:assets';
+import type { ImageOutputFormat } from 'astro';
+import dsDark from '../../assets/covers/ds-cover-dark.png';
+import dsLight from '../../assets/covers/ds-cover-light.png';
+import opsDark from '../../assets/covers/ops-cover-dark.png';
+import opsLight from '../../assets/covers/ops-cover-light.png';
+import btLight from '../../assets/covers/bt-cover-light.png';
+/* Covers ship as AVIF/WebP in several widths; sizes follows the bento: 7 of 12 columns from 1200 px, full width below. */
+const cover = { formats: ['avif'] as ImageOutputFormat[], fallbackFormat: 'webp' as ImageOutputFormat, widths: [480, 800, 1200, 1600], sizes: '(min-width: 1200px) min(58vw, 820px), calc(100vw - 32px)', loading: 'lazy' as const };
 ---
 <section class="sec" id="obras" aria-labelledby="obrasTitle">
     <div class="wrap">
@@ -12,8 +21,8 @@ const tr = (es: string, en: string) => (locale === 'en' ? en : es);
       </div>
       <div class="bento">
         <figure class="tile cover b-ds-cover tilt rise">
-          <img class="img-dark" src="/assets/ds-cover-dark.png" alt={tr("Portada de Hexalis Design System: panal de hexágonos con botones, interruptores y campos.", "Hexalis Design System cover: a honeycomb of hexagons with buttons, switches and fields.")} loading="lazy">
-          <img class="img-light" src="/assets/ds-cover-light.png" alt={tr("Portada de Hexalis Design System: panal de hexágonos con botones, interruptores y campos.", "Hexalis Design System cover: a honeycomb of hexagons with buttons, switches and fields.")} loading="lazy">
+          <Picture src={dsDark} class="img-dark" alt={tr("Portada de Hexalis Design System: panal de hexágonos con botones, interruptores y campos.", "Hexalis Design System cover: a honeycomb of hexagons with buttons, switches and fields.")} {...cover} />
+          <Picture src={dsLight} class="img-light" alt={tr("Portada de Hexalis Design System: panal de hexágonos con botones, interruptores y campos.", "Hexalis Design System cover: a honeycomb of hexagons with buttons, switches and fields.")} {...cover} />
         </figure>
         <div class="tile info b-ds-info rise">
           <div class="tile-title"><h3>Hexalis Design System</h3><span>v2.0.0 · MIT + CC BY 4.0</span></div>
@@ -38,11 +47,11 @@ const tr = (es: string, en: string) => (locale === 'en' ? en : es);
           <div class="actions"><a class="btn btn-ops" data-link="opsFigma" href="#">{tr("Abrir en Figma", "Open in Figma")}</a><a class="btn btn-ghost" data-link="opsRepo" href="#">GitHub</a></div>
         </div>
         <figure class="tile cover b-ops-cover tilt rise">
-          <img class="img-dark" src="/assets/ops-cover-dark.png" alt={tr("Portada de Hexalis Design Ops Toolkit: ciclo de seis fases en hexágonos, de Set up a Review.", "Hexalis Design Ops Toolkit cover: a six-phase cycle in hexagons, from Set up to Review.")} loading="lazy">
-          <img class="img-light" src="/assets/ops-cover-light.png" alt={tr("Portada de Hexalis Design Ops Toolkit: ciclo de seis fases en hexágonos, de Set up a Review.", "Hexalis Design Ops Toolkit cover: a six-phase cycle in hexagons, from Set up to Review.")} loading="lazy">
+          <Picture src={opsDark} class="img-dark" alt={tr("Portada de Hexalis Design Ops Toolkit: ciclo de seis fases en hexágonos, de Set up a Review.", "Hexalis Design Ops Toolkit cover: a six-phase cycle in hexagons, from Set up to Review.")} {...cover} />
+          <Picture src={opsLight} class="img-light" alt={tr("Portada de Hexalis Design Ops Toolkit: ciclo de seis fases en hexágonos, de Set up a Review.", "Hexalis Design Ops Toolkit cover: a six-phase cycle in hexagons, from Set up to Review.")} {...cover} />
         </figure>
         <figure class="tile cover b-bt-cover tilt rise">
-          <img src="/assets/bt-cover-light.png" alt={tr("Portada de Hexalis Blocks & Templates: bloques hexagonales con interruptores, botones, pestañas y gráficos que encajan en una plantilla.", "Hexalis Blocks & Templates cover: hexagonal blocks with switches, buttons, tabs and charts snapping into a template.")} loading="lazy">
+          <Picture src={btLight} alt={tr("Portada de Hexalis Blocks & Templates: bloques hexagonales con interruptores, botones, pestañas y gráficos que encajan en una plantilla.", "Hexalis Blocks & Templates cover: hexagonal blocks with switches, buttons, tabs and charts snapping into a template.")} {...cover} />
         </figure>
         <div class="tile info b-bt-info rise">
           <div class="tile-title"><h3>Hexalis Blocks &amp; Templates</h3><span>v0.2.0 · MIT + CC BY 4.0</span></div>

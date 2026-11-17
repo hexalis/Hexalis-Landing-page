@@ -5,6 +5,8 @@ import SiteChrome from '../components/layout/SiteChrome.astro';
 import SiteFooter from '../components/layout/SiteFooter.astro';
 import CommandPalette from '../components/ui/CommandPalette.astro';
 import type { Locale } from '../lib/routes';
+// The hero headline is set in Inter; preloading its Latin subset starts the download before the CSS is parsed.
+import interLatin from '../assets/fonts/inter-latin.woff2?url';
 interface Props { title: string; description: string; shareDescription?: string; locale: Locale; path?: string; noindex?: boolean; chrome?: boolean }
 const { title, description, shareDescription = description, locale, path = '', noindex = false, chrome = true } = Astro.props;
 ---
@@ -18,6 +20,7 @@ const { title, description, shareDescription = description, locale, path = '', n
     <meta name="theme-color" content="#06080F" media="(prefers-color-scheme: dark)" />
     <meta name="theme-color" content="#F3F4F8" media="(prefers-color-scheme: light)" />
     <meta name="color-scheme" content="dark light" />
+    <link rel="preload" href={interLatin} as="font" type="font/woff2" crossorigin />
     <SeoHead title={title} description={description} shareDescription={shareDescription} locale={locale} path={path} noindex={noindex} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
